@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CloudBin - Firestore Storage</title>
+    <title>CloudBin - Secure Sharing</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <style>
@@ -11,57 +11,61 @@
         .loader { border: 4px solid #f3f3f3; border-top: 4px solid #3b82f6; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .hidden { display: none !important; }
+        /* Modal Backdrop */
+        .modal-bg { background-color: rgba(0,0,0,0.5); }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen text-gray-800">
+<body class="bg-gray-50 min-h-screen text-gray-800">
 
     <!-- Navigation -->
-    <nav class="bg-white shadow-md p-4 sticky top-0 z-50">
-        <div class="max-w-5xl mx-auto flex justify-between items-center">
+    <nav class="bg-white shadow-md p-4 sticky top-0 z-40">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.hash='#dashboard'">
-                <i class="fa-solid fa-cloud text-blue-600 text-2xl"></i>
-                <span class="font-bold text-xl tracking-tight">CloudBin</span>
+                <div class="bg-blue-600 text-white p-2 rounded-lg">
+                    <i class="fa-solid fa-cloud text-lg"></i>
+                </div>
+                <span class="font-bold text-xl tracking-tight text-gray-700">CloudBin</span>
             </div>
             <div id="nav-auth" class="hidden flex items-center gap-4">
-                <span id="user-email" class="text-sm text-gray-500 hidden md:block"></span>
-                <button id="btn-logout" class="text-sm text-red-500 hover:text-red-700 font-medium">Logout</button>
+                <span id="user-email" class="text-sm text-gray-500 hidden md:block font-medium"></span>
+                <button id="btn-logout" class="text-sm text-red-500 hover:text-red-700 font-medium border border-red-100 bg-red-50 px-3 py-1 rounded transition">Logout</button>
             </div>
         </div>
     </nav>
 
     <!-- Main Content Area -->
-    <main class="max-w-5xl mx-auto p-4 mt-6">
+    <main class="max-w-6xl mx-auto p-4 mt-6">
         
         <!-- Loading Screen -->
         <div id="view-loading" class="view flex flex-col items-center justify-center h-64">
             <div class="loader mb-4"></div>
-            <p class="text-gray-500">Connecting to CloudBin...</p>
+            <p class="text-gray-500">Connecting to secure storage...</p>
         </div>
 
         <!-- Login View -->
         <div id="view-login" class="view hidden flex flex-col items-center justify-center pt-10">
-            <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md text-center">
-                <h2 class="text-2xl font-bold mb-2">Welcome Back</h2>
-                <p class="text-gray-500 mb-8">Sign in to access your files</p>
+            <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md text-center border border-gray-100">
+                <h2 class="text-3xl font-bold mb-2 text-gray-800">Welcome Back</h2>
+                <p class="text-gray-500 mb-8">Securely store and share your files</p>
                 
                 <div class="space-y-4">
-                    <button id="btn-google" class="w-full bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 py-3 rounded-lg flex items-center justify-center gap-3 transition shadow-sm">
+                    <button id="btn-google" class="w-full bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 py-3 rounded-xl flex items-center justify-center gap-3 transition shadow-sm font-medium">
                         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5">
                         Continue with Google
                     </button>
 
                     <div class="relative flex py-2 items-center">
                         <div class="flex-grow border-t border-gray-300"></div>
-                        <span class="flex-shrink-0 mx-4 text-gray-400 text-sm">Or email</span>
+                        <span class="flex-shrink-0 mx-4 text-gray-400 text-xs uppercase tracking-wide">Or email</span>
                         <div class="flex-grow border-t border-gray-300"></div>
                     </div>
 
                     <form id="email-form" class="space-y-3 text-left">
-                        <input type="email" id="inp-email" placeholder="Email" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <input type="password" id="inp-password" placeholder="Password" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <div class="flex gap-2">
-                            <button type="button" id="btn-signin" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium transition">Sign In</button>
-                            <button type="button" id="btn-signup" class="flex-1 bg-gray-800 hover:bg-gray-900 text-white py-3 rounded-lg font-medium transition">Sign Up</button>
+                        <input type="email" id="inp-email" placeholder="Email address" class="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50">
+                        <input type="password" id="inp-password" placeholder="Password" class="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50">
+                        <div class="flex gap-3 pt-2">
+                            <button type="button" id="btn-signin" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold transition shadow-lg shadow-blue-200">Sign In</button>
+                            <button type="button" id="btn-signup" class="flex-1 bg-gray-800 hover:bg-gray-900 text-white py-3 rounded-xl font-bold transition shadow-lg shadow-gray-300">Sign Up</button>
                         </div>
                     </form>
                 </div>
@@ -70,91 +74,180 @@
 
         <!-- Dashboard View -->
         <div id="view-dashboard" class="view hidden">
-            <div class="flex justify-between items-center mb-6">
-                <h1 class="text-2xl font-bold">My Files</h1>
-                <a href="#upload" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow flex items-center gap-2 transition">
-                    <i class="fa-solid fa-plus"></i> Upload New
+            <!-- Dashboard Header & Tabs -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">Dashboard</h1>
+                    <p class="text-gray-500 text-sm">Manage your cloud artifacts</p>
+                </div>
+                <div class="flex gap-2 bg-gray-200 p-1 rounded-lg">
+                    <button id="tab-mine" class="px-4 py-2 rounded-md text-sm font-medium bg-white shadow text-gray-800 transition">My Files</button>
+                    <button id="tab-shared" class="px-4 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-800 transition">Shared with Me</button>
+                </div>
+                <a href="#upload" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow-lg shadow-blue-200 flex items-center gap-2 transition font-medium">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Upload
                 </a>
             </div>
 
-            <div id="file-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div id="file-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 <!-- Files injected here -->
             </div>
-            <div id="empty-state" class="hidden text-center py-20 text-gray-400">
-                <i class="fa-regular fa-folder-open text-6xl mb-4"></i>
-                <p>No files found. Start by uploading one!</p>
+            
+            <div id="empty-state" class="hidden text-center py-24 text-gray-400">
+                <div class="bg-gray-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa-regular fa-folder-open text-4xl text-gray-300"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-600">No files found</h3>
+                <p class="text-sm">Upload a file or check your shared tab.</p>
             </div>
         </div>
 
         <!-- Upload View -->
         <div id="view-upload" class="view hidden">
-            <div class="bg-white p-6 rounded-xl shadow-md max-w-2xl mx-auto">
+            <div class="bg-white p-8 rounded-2xl shadow-md max-w-2xl mx-auto border border-gray-100">
                 <div class="flex justify-between items-center mb-6 border-b pb-4">
-                    <h2 class="text-xl font-bold">Upload File</h2>
-                    <a href="#dashboard" class="text-gray-500 hover:text-gray-700"><i class="fa-solid fa-xmark"></i></a>
+                    <h2 class="text-xl font-bold text-gray-800">Upload File</h2>
+                    <a href="#dashboard" class="text-gray-400 hover:text-gray-600 transition"><i class="fa-solid fa-xmark text-xl"></i></a>
                 </div>
 
                 <div class="space-y-6">
-                    <div class="border-2 border-dashed border-blue-200 bg-blue-50 rounded-xl p-10 text-center hover:bg-blue-100 transition cursor-pointer relative">
-                        <input type="file" id="file-input" class="absolute inset-0 opacity-0 w-full h-full cursor-pointer">
-                        <i class="fa-solid fa-cloud-arrow-up text-4xl text-blue-500 mb-3"></i>
-                        <p class="text-gray-600 font-medium">Click or Drag file to upload</p>
-                        <p class="text-xs text-gray-400 mt-1">Note: Files are chunked. Large files may take time.</p>
+                    <div class="border-2 border-dashed border-blue-200 bg-blue-50 rounded-2xl p-12 text-center hover:bg-blue-100 transition cursor-pointer relative group">
+                        <input type="file" id="file-input" class="absolute inset-0 opacity-0 w-full h-full cursor-pointer z-10">
+                        <div class="transition-transform group-hover:scale-110 duration-300 inline-block">
+                            <i class="fa-solid fa-cloud-arrow-up text-5xl text-blue-500 mb-4"></i>
+                        </div>
+                        <p class="text-gray-700 font-bold text-lg">Click or Drag file to upload</p>
+                        <p class="text-sm text-gray-400 mt-2">Files are securely chunked (max 10MB recommended)</p>
                     </div>
 
                     <div id="upload-progress-container" class="hidden">
-                        <div class="flex justify-between text-sm mb-1">
+                        <div class="flex justify-between text-sm mb-2 font-medium text-gray-600">
                             <span id="upload-status">Processing...</span>
                             <span id="upload-percent">0%</span>
                         </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2.5">
-                            <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                        <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                            <div id="progress-bar" class="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- File Detail/View -->
+        <!-- File Detail View -->
         <div id="view-file" class="view hidden">
-            <div class="mb-4">
-                <a href="#dashboard" class="text-blue-600 hover:underline text-sm"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a>
-            </div>
-            <div class="bg-white p-8 rounded-xl shadow-lg text-center">
-                <div id="file-preview-icon" class="mb-6">
-                    <i class="fa-solid fa-file text-6xl text-gray-300"></i>
+            <div class="max-w-4xl mx-auto">
+                <div class="mb-6 flex items-center justify-between">
+                    <a href="#dashboard" class="text-gray-500 hover:text-blue-600 text-sm font-medium transition flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+                    </a>
                 </div>
-                <h1 id="file-name-display" class="text-2xl font-bold break-words mb-2">filename.ext</h1>
-                <p id="file-meta-display" class="text-gray-500 text-sm mb-8">Size: -- | Type: --</p>
 
-                <div id="download-section">
-                    <p id="reassembly-status" class="text-sm text-blue-600 mb-4 hidden"><i class="fa-solid fa-circle-notch fa-spin"></i> Reassembling chunks...</p>
-                    <button id="btn-download" class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-bold shadow transition disabled:opacity-50 disabled:cursor-not-allowed">
-                        <i class="fa-solid fa-download"></i> Download / View
-                    </button>
-                    <p id="error-msg" class="text-red-500 mt-4 hidden"></p>
-                </div>
-                
-                <div id="preview-container" class="mt-8 hidden border-t pt-6">
-                    <h3 class="text-lg font-semibold mb-4 text-left">Preview</h3>
-                    <div id="media-preview" class="border rounded bg-gray-50 p-2 overflow-auto max-h-96"></div>
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+                    <!-- Header -->
+                    <div class="bg-gray-50 p-8 border-b text-center relative">
+                        <div id="file-preview-icon" class="mb-4 transform transition hover:scale-110 duration-500 inline-block">
+                            <i class="fa-solid fa-file text-6xl text-gray-300"></i>
+                        </div>
+                        <h1 id="file-name-display" class="text-2xl font-bold break-words text-gray-800 mb-2">filename.ext</h1>
+                        <div class="flex justify-center items-center gap-3 text-sm text-gray-500">
+                            <span id="file-meta-display">Size: -- | Type: --</span>
+                            <span id="file-visibility-badge" class="px-2 py-0.5 rounded text-xs font-bold uppercase bg-gray-200 text-gray-600">Loading</span>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="p-8 text-center">
+                        <div id="download-section" class="space-y-4">
+                            <p id="reassembly-status" class="text-sm text-blue-600 font-medium hidden bg-blue-50 inline-block px-4 py-2 rounded-full">
+                                <i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Reassembling encrypted chunks...
+                            </p>
+                            
+                            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                                <button id="btn-download" class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-green-200 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-download"></i> Download / View
+                                </button>
+                                
+                                <button id="btn-share-trigger" class="hidden bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-indigo-200 transition flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-user-plus"></i> Share
+                                </button>
+                            </div>
+
+                            <p id="error-msg" class="text-red-500 mt-4 hidden bg-red-50 p-3 rounded-lg border border-red-100"></p>
+                        </div>
+                        
+                        <div id="preview-container" class="mt-8 hidden border-t pt-8">
+                            <h3 class="text-lg font-bold mb-4 text-left text-gray-700">Preview</h3>
+                            <div id="media-preview" class="border-2 border-gray-100 rounded-xl bg-gray-50 p-4 overflow-auto max-h-96 flex justify-center"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
     </main>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-20 transition-transform duration-300 z-50">
-        Notification
+    <!-- Share Modal -->
+    <div id="modal-share" class="fixed inset-0 z-50 hidden flex items-center justify-center modal-bg backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden animate-fade-in-up">
+            <div class="p-6 border-b flex justify-between items-center bg-gray-50">
+                <h3 class="text-lg font-bold text-gray-800">Share File</h3>
+                <button onclick="closeShareModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            
+            <div class="p-6 space-y-6">
+                <!-- Visibility Selector -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">General Access</label>
+                    <select id="share-visibility" class="w-full p-3 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                        <option value="private">🔒 Restricted (Only added users)</option>
+                        <option value="public">🌍 Public (Anyone with link)</option>
+                    </select>
+                </div>
+
+                <!-- Add People (Conditional) -->
+                <div id="share-people-section">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Add People</label>
+                    <div class="flex gap-2">
+                        <input type="email" id="share-email-input" placeholder="Enter email address" class="flex-1 p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500">
+                        <button id="btn-add-share" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 rounded-xl font-medium transition">Add</button>
+                    </div>
+                    
+                    <!-- List of shared users -->
+                    <div class="mt-4">
+                        <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Access List</h4>
+                        <div id="share-list" class="space-y-2 max-h-40 overflow-y-auto pr-2">
+                            <!-- Items injected here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Link Copy -->
+                <div class="pt-4 border-t">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">File Link</label>
+                    <div class="flex gap-2 bg-gray-100 p-2 rounded-xl border border-gray-200">
+                        <input type="text" id="share-link-input" readonly class="flex-1 bg-transparent text-sm text-gray-600 focus:outline-none px-2">
+                        <button id="btn-copy-link" class="text-indigo-600 hover:text-indigo-800 font-bold text-sm px-2">Copy</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-4 border-t bg-gray-50 flex justify-end">
+                <button onclick="closeShareModal()" class="px-6 py-2 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-100 transition">Done</button>
+            </div>
+        </div>
     </div>
 
-    <!-- Firebase Logic -->
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 px-6 py-3 rounded-xl shadow-2xl transform translate-y-24 transition-all duration-300 z-50 font-medium flex items-center gap-3">
+        <span id="toast-icon"></span>
+        <span id="toast-msg">Notification</span>
+    </div>
+
+    <!-- Firebase & App Logic -->
     <script type="module">
-        // Use stable versions for Auth and Firestore to ensure compatibility
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, query, where, getDocs, orderBy, doc, deleteDoc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, query, where, getDocs, orderBy, doc, deleteDoc, setDoc, getDoc, updateDoc, arrayUnion, arrayRemove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCT6JM1Njg3D9IwicsxJdo2MKjP3gGfUqU",
@@ -166,161 +259,247 @@
             measurementId: "G-QYLJF2DWCX"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- State & Constants ---
+        // --- State ---
         let currentUser = null;
-        // Safe chunk size: 500KB. Base64 increases size by ~33%.
-        // 500KB * 1.33 = ~665KB, well under the 1MB Firestore limit.
+        let currentDashboardTab = 'mine'; // 'mine' or 'shared'
+        let activeFileId = null; // For sharing modal
+        let activeFileOwnerId = null;
         const CHUNK_SIZE_BYTES = 500 * 1024; 
 
-        // --- Routing ---
-        const routes = {
-            '': 'view-loading',
-            '#login': 'view-login',
-            '#dashboard': 'view-dashboard',
-            '#upload': 'view-upload',
-            '#file': 'view-file' // Handles #view?id=xyz via partial match logic
-        };
-
-        function handleRoute() {
+        // --- UI Helpers ---
+        const getEl = (id) => document.getElementById(id);
+        const hideAllViews = () => document.querySelectorAll('.view').forEach(el => el.classList.add('hidden'));
+        
+        // --- Routing & Auth Guard ---
+        const handleRoute = async () => {
             const hash = window.location.hash.split('?')[0] || '';
             const queryParams = new URLSearchParams(window.location.hash.split('?')[1]);
 
-            // Auth Guard
-            if (!currentUser && hash !== '#login') {
-                window.location.hash = '#login';
-                return;
-            }
-            if (currentUser && hash === '#login') {
-                window.location.hash = '#dashboard';
-                return;
-            }
-
-            // Hide all views
-            document.querySelectorAll('.view').forEach(el => el.classList.add('hidden'));
-
-            // specific view logic
+            // 1. Public Access Handling (for #view)
+            // If viewing a file, we don't immediately enforce login.
+            // We let the loadFileDetails function handle permission errors.
             if (hash === '#view') {
+                hideAllViews();
+                getEl('view-file').classList.remove('hidden');
                 const fileId = queryParams.get('id');
                 if (fileId) {
-                    document.getElementById('view-file').classList.remove('hidden');
                     loadFileDetails(fileId);
                 } else {
                     window.location.hash = '#dashboard';
                 }
-            } else if (routes[hash]) {
-                document.getElementById(routes[hash]).classList.remove('hidden');
-                if (hash === '#dashboard') loadDashboard();
-            } else {
-                // Default to dashboard if logged in, login if not
-                window.location.hash = currentUser ? '#dashboard' : '#login';
+                return; 
             }
-        }
+
+            // 2. Authenticated Routes
+            if (!currentUser) {
+                if (hash !== '#login') {
+                    window.location.hash = '#login'; // Redirect to login
+                    return;
+                }
+            } else {
+                if (hash === '#login') {
+                    window.location.hash = '#dashboard';
+                    return;
+                }
+            }
+
+            hideAllViews();
+
+            if (hash === '#dashboard') {
+                getEl('view-dashboard').classList.remove('hidden');
+                loadDashboard();
+            } else if (hash === '#upload') {
+                getEl('view-upload').classList.remove('hidden');
+            } else if (hash === '#login') {
+                getEl('view-login').classList.remove('hidden');
+            }
+        };
 
         window.addEventListener('hashchange', handleRoute);
 
-        // --- Auth ---
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
-            const navAuth = document.getElementById('nav-auth');
+            const navAuth = getEl('nav-auth');
             if (user) {
-                document.getElementById('user-email').textContent = user.email;
+                getEl('user-email').textContent = user.email;
                 navAuth.classList.remove('hidden');
-                if(window.location.hash === '#login' || window.location.hash === '') {
-                    window.location.hash = '#dashboard';
-                }
+                if(window.location.hash === '#login' || window.location.hash === '') window.location.hash = '#dashboard';
             } else {
                 navAuth.classList.add('hidden');
-                window.location.hash = '#login';
+                // Don't auto redirect if user is trying to view a public link
+                if(!window.location.hash.startsWith('#view')) {
+                    window.location.hash = '#login';
+                }
             }
             handleRoute();
         });
 
-        document.getElementById('btn-google').onclick = async () => {
-            try {
-                const provider = new GoogleAuthProvider();
-                await signInWithPopup(auth, provider);
-            } catch (error) {
-                showToast(error.message, true);
+        // --- Auth Actions ---
+        getEl('btn-google').onclick = async () => {
+            try { await signInWithPopup(auth, new GoogleAuthProvider()); } 
+            catch (e) { showToast(e.message, true); }
+        };
+        getEl('btn-signin').onclick = async () => {
+            try { await signInWithEmailAndPassword(auth, getEl('inp-email').value, getEl('inp-password').value); } 
+            catch (e) { showToast(e.message, true); }
+        };
+        getEl('btn-signup').onclick = async () => {
+            try { await createUserWithEmailAndPassword(auth, getEl('inp-email').value, getEl('inp-password').value); } 
+            catch (e) { showToast(e.message, true); }
+        };
+        getEl('btn-logout').onclick = () => signOut(auth);
+
+        // --- Dashboard Logic ---
+        getEl('tab-mine').onclick = () => { currentDashboardTab = 'mine'; updateTabUI(); loadDashboard(); };
+        getEl('tab-shared').onclick = () => { currentDashboardTab = 'shared'; updateTabUI(); loadDashboard(); };
+
+        function updateTabUI() {
+            const mineBtn = getEl('tab-mine');
+            const sharedBtn = getEl('tab-shared');
+            if(currentDashboardTab === 'mine') {
+                mineBtn.className = "px-4 py-2 rounded-md text-sm font-bold bg-white shadow text-blue-600 ring-1 ring-gray-200 transition";
+                sharedBtn.className = "px-4 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700 transition";
+            } else {
+                mineBtn.className = "px-4 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700 transition";
+                sharedBtn.className = "px-4 py-2 rounded-md text-sm font-bold bg-white shadow text-blue-600 ring-1 ring-gray-200 transition";
             }
-        };
+        }
 
-        document.getElementById('btn-signin').onclick = async () => {
-            const e = document.getElementById('inp-email').value;
-            const p = document.getElementById('inp-password').value;
-            try { await signInWithEmailAndPassword(auth, e, p); } 
-            catch (err) { showToast(err.message, true); }
-        };
+        async function loadDashboard() {
+            const list = getEl('file-list');
+            const empty = getEl('empty-state');
+            list.innerHTML = '<div class="col-span-full flex justify-center"><div class="loader"></div></div>';
+            
+            try {
+                let q;
+                if (currentDashboardTab === 'mine') {
+                    // Query my files
+                    q = query(collection(db, "files"), where("ownerId", "==", currentUser.uid), orderBy("createdAt", "desc"));
+                } else {
+                    // Query shared with me
+                    // Note: "sharedWith" array-contains check.
+                    // Public files are usually not listed in a personal dashboard unless explicitly tracked,
+                    // but here we list files explicitly shared with this email.
+                    q = query(collection(db, "files"), where("sharedWith", "array-contains", currentUser.email));
+                    // Note: orderBy can require composite index with array-contains. Keep it simple for now.
+                }
 
-        document.getElementById('btn-signup').onclick = async () => {
-            const e = document.getElementById('inp-email').value;
-            const p = document.getElementById('inp-password').value;
-            try { await createUserWithEmailAndPassword(auth, e, p); } 
-            catch (err) { showToast(err.message, true); }
-        };
+                const snapshot = await getDocs(q);
+                list.innerHTML = '';
 
-        document.getElementById('btn-logout').onclick = () => signOut(auth);
+                if (snapshot.empty) {
+                    empty.classList.remove('hidden');
+                    return;
+                }
+                empty.classList.add('hidden');
 
-        // --- Core Logic: Helper to read file as Base64 ---
-        const readFileAsBase64 = (file) => {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-                reader.readAsDataURL(file);
-            });
-        };
+                snapshot.forEach(d => {
+                    const data = d.data();
+                    renderFileCard(d.id, data, list);
+                });
+
+            } catch (err) {
+                console.error(err);
+                list.innerHTML = `<p class="text-red-500 col-span-full text-center">Unable to load files. ${err.message}</p>`;
+            }
+        }
+
+        function renderFileCard(id, data, container) {
+            const isMine = data.ownerId === currentUser.uid;
+            const date = data.createdAt ? data.createdAt.toDate().toLocaleDateString() : 'Just now';
+            const sizeStr = (data.size / 1024 / 1024).toFixed(2) + ' MB';
+            
+            let iconClass = 'fa-file';
+            if(data.type.includes('image')) iconClass = 'fa-file-image text-purple-500';
+            else if(data.type.includes('pdf')) iconClass = 'fa-file-pdf text-red-500';
+            else if(data.type.includes('video')) iconClass = 'fa-file-video text-pink-500';
+            else if(data.type.includes('text') || data.type.includes('code')) iconClass = 'fa-file-code text-yellow-500';
+            else iconClass = 'fa-file text-blue-500';
+
+            // Visibility Icon
+            let visIcon = '<i class="fa-solid fa-lock text-gray-400" title="Private"></i>';
+            if(data.visibility === 'public') visIcon = '<i class="fa-solid fa-earth-americas text-green-500" title="Public"></i>';
+            else if(data.visibility === 'shared') visIcon = '<i class="fa-solid fa-user-group text-indigo-500" title="Shared"></i>';
+
+            const card = document.createElement('div');
+            card.className = 'bg-white p-5 rounded-xl shadow hover:shadow-lg transition-shadow border border-gray-100 flex flex-col group';
+            card.innerHTML = `
+                <div class="flex items-start justify-between mb-4">
+                    <i class="fa-regular ${iconClass} text-4xl group-hover:scale-110 transition-transform"></i>
+                    <div class="flex gap-2">
+                        ${isMine ? `<button class="text-gray-300 hover:text-red-500 transition delete-btn" data-id="${id}"><i class="fa-solid fa-trash"></i></button>` : ''}
+                    </div>
+                </div>
+                <h3 class="font-bold truncate text-gray-800 mb-1" title="${data.name}">${data.name}</h3>
+                <div class="flex justify-between items-center text-xs text-gray-400 mb-4">
+                    <span>${sizeStr} • ${date}</span>
+                    <span>${visIcon}</span>
+                </div>
+                <a href="#view?id=${id}" class="mt-auto text-center w-full py-2.5 bg-gray-50 hover:bg-blue-50 hover:text-blue-600 border border-gray-200 rounded-lg text-sm font-bold transition">
+                    Open File
+                </a>
+            `;
+            container.appendChild(card);
+            
+            // Event Listeners (Delete)
+            const delBtn = card.querySelector('.delete-btn');
+            if(delBtn) delBtn.onclick = (e) => { e.preventDefault(); deleteFile(id); };
+        }
 
         // --- Upload Logic ---
-        const fileInput = document.getElementById('file-input');
+        const fileInput = getEl('file-input');
         fileInput.addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
+            if(!currentUser) { showToast("Please login to upload", true); return; }
 
-            const progressContainer = document.getElementById('upload-progress-container');
-            const progressBar = document.getElementById('progress-bar');
-            const statusText = document.getElementById('upload-status');
-            const percentText = document.getElementById('upload-percent');
+            const progressContainer = getEl('upload-progress-container');
+            const progressBar = getEl('progress-bar');
+            const statusText = getEl('upload-status');
+            const percentText = getEl('upload-percent');
 
             progressContainer.classList.remove('hidden');
             statusText.textContent = "Reading file...";
             progressBar.style.width = '0%';
 
             try {
-                const base64String = await readFileAsBase64(file);
+                const base64String = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.readAsDataURL(file);
+                });
                 
-                // Create chunks
-                const totalLength = base64String.length;
+                // Chunking
                 const chunks = [];
-                for (let i = 0; i < totalLength; i += CHUNK_SIZE_BYTES) {
+                for (let i = 0; i < base64String.length; i += CHUNK_SIZE_BYTES) {
                     chunks.push(base64String.substring(i, i + CHUNK_SIZE_BYTES));
                 }
 
-                statusText.textContent = `Uploading metadata...`;
+                statusText.textContent = `Initializing...`;
 
-                // 1. Create Metadata Document
+                // 1. Create Metadata (With Sharing Fields)
                 const fileRef = await addDoc(collection(db, "files"), {
                     name: file.name,
                     type: file.type,
                     size: file.size,
                     chunkCount: chunks.length,
                     ownerId: currentUser.uid,
+                    visibility: 'private', // Default
+                    sharedWith: [],        // Default
                     createdAt: serverTimestamp()
                 });
 
-                // 2. Upload Chunks to subcollection
-                const totalChunks = chunks.length;
-                for (let i = 0; i < totalChunks; i++) {
-                    statusText.textContent = `Uploading chunk ${i + 1} of ${totalChunks}...`;
-                    const pct = Math.round(((i) / totalChunks) * 100);
+                // 2. Upload Chunks
+                for (let i = 0; i < chunks.length; i++) {
+                    statusText.textContent = `Uploading part ${i + 1}/${chunks.length}`;
+                    const pct = Math.round(((i) / chunks.length) * 100);
                     progressBar.style.width = `${pct}%`;
                     percentText.textContent = `${pct}%`;
-
-                    // Upload chunk to subcollection
+                    
                     await setDoc(doc(db, "files", fileRef.id, "chunks", i.toString()), {
                         data: chunks[i],
                         index: i
@@ -329,7 +508,7 @@
 
                 progressBar.style.width = '100%';
                 percentText.textContent = '100%';
-                statusText.textContent = "Upload Complete!";
+                statusText.textContent = "Finishing up...";
                 showToast("File uploaded successfully!");
                 
                 setTimeout(() => {
@@ -341,166 +520,119 @@
             } catch (err) {
                 console.error(err);
                 showToast("Upload failed: " + err.message, true);
-                statusText.textContent = "Error";
                 progressContainer.classList.add('hidden');
             }
         });
 
-        // --- Dashboard Logic ---
-        async function loadDashboard() {
-            const list = document.getElementById('file-list');
-            const empty = document.getElementById('empty-state');
-            list.innerHTML = '<div class="col-span-full text-center"><div class="loader mx-auto"></div></div>';
-            
-            try {
-                const q = query(
-                    collection(db, "files"), 
-                    where("ownerId", "==", currentUser.uid),
-                    orderBy("createdAt", "desc")
-                );
-                const snapshot = await getDocs(q);
-
-                list.innerHTML = '';
-                if (snapshot.empty) {
-                    empty.classList.remove('hidden');
-                    return;
-                }
-                empty.classList.add('hidden');
-
-                snapshot.forEach(doc => {
-                    const d = doc.data();
-                    const date = d.createdAt ? d.createdAt.toDate().toLocaleDateString() : 'Just now';
-                    const sizeStr = (d.size / 1024 / 1024).toFixed(2) + ' MB';
-                    
-                    // Icon selection based on type
-                    let iconClass = 'fa-file';
-                    if(d.type.includes('image')) iconClass = 'fa-file-image';
-                    else if(d.type.includes('pdf')) iconClass = 'fa-file-pdf';
-                    else if(d.type.includes('video')) iconClass = 'fa-file-video';
-
-                    const card = document.createElement('div');
-                    card.className = 'bg-white p-4 rounded-xl shadow hover:shadow-md transition border border-gray-100 flex flex-col';
-                    card.innerHTML = `
-                        <div class="flex items-start justify-between mb-3">
-                            <i class="fa-regular ${iconClass} text-3xl text-blue-500"></i>
-                            <button class="text-red-400 hover:text-red-600 delete-btn" data-id="${doc.id}">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </div>
-                        <h3 class="font-semibold truncate mb-1" title="${d.name}">${d.name}</h3>
-                        <p class="text-xs text-gray-400 mb-4">${sizeStr} • ${date}</p>
-                        <a href="#view?id=${doc.id}" class="mt-auto text-center w-full py-2 bg-gray-50 hover:bg-gray-100 text-blue-600 rounded text-sm font-medium">
-                            Open File
-                        </a>
-                    `;
-                    list.appendChild(card);
-                });
-
-                // Attach delete handlers
-                document.querySelectorAll('.delete-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => deleteFile(e.currentTarget.dataset.id));
-                });
-
-            } catch (err) {
-                console.error(err);
-                list.innerHTML = '<p class="text-red-500 col-span-full">Error loading files.</p>';
-            }
-        }
-
-        async function deleteFile(id) {
-            if(!confirm("Are you sure you want to delete this file? It cannot be undone.")) return;
-            try {
-                // Note: In a real app, use Cloud Functions to recursively delete subcollections. 
-                // Here, we will just delete metadata to hide it, but chunks remain orphaned in Firestore 
-                // (client-side recursive delete is heavy).
-                // For this demo, we delete the meta doc.
-                await deleteDoc(doc(db, "files", id));
-                loadDashboard();
-                showToast("File deleted.");
-            } catch(err) {
-                showToast("Delete failed: " + err.message, true);
-            }
-        }
-
-        // --- View/Download Logic ---
+        // --- View File Logic ---
         async function loadFileDetails(fileId) {
-            const nameDisplay = document.getElementById('file-name-display');
-            const metaDisplay = document.getElementById('file-meta-display');
-            const downloadBtn = document.getElementById('btn-download');
-            const statusMsg = document.getElementById('reassembly-status');
-            const errorMsg = document.getElementById('error-msg');
-            const previewContainer = document.getElementById('preview-container');
-            const mediaPreview = document.getElementById('media-preview');
+            const nameDisplay = getEl('file-name-display');
+            const metaDisplay = getEl('file-meta-display');
+            const visBadge = getEl('file-visibility-badge');
+            const downloadBtn = getEl('btn-download');
+            const shareBtn = getEl('btn-share-trigger');
+            const errorMsg = getEl('error-msg');
 
-            // Reset UI
-            nameDisplay.textContent = "Loading...";
+            // Reset
+            nameDisplay.textContent = "Fetching Metadata...";
             metaDisplay.textContent = "";
+            visBadge.className = "hidden";
             downloadBtn.disabled = true;
-            statusMsg.classList.add('hidden');
+            shareBtn.classList.add('hidden');
             errorMsg.classList.add('hidden');
-            previewContainer.classList.add('hidden');
-            mediaPreview.innerHTML = '';
+            getEl('preview-container').classList.add('hidden');
+            getEl('media-preview').innerHTML = '';
 
             try {
-                // 1. Get Metadata
                 const fileSnap = await getDoc(doc(db, "files", fileId));
-                if (!fileSnap.exists()) throw new Error("File not found");
+                
+                if (!fileSnap.exists()) {
+                    // This might also happen if permission denied and rules reject the 'get'
+                    throw new Error("File not found or access denied.");
+                }
 
                 const meta = fileSnap.data();
+                activeFileId = fileId;
+                activeFileOwnerId = meta.ownerId;
+
                 nameDisplay.textContent = meta.name;
                 metaDisplay.textContent = `Size: ${(meta.size/1024).toFixed(1)} KB | Type: ${meta.type}`;
                 
+                // Set Visibility Badge
+                visBadge.classList.remove('hidden');
+                if(meta.visibility === 'private') {
+                    visBadge.textContent = "Private";
+                    visBadge.className = "px-2 py-0.5 rounded text-xs font-bold uppercase bg-gray-200 text-gray-600";
+                } else if (meta.visibility === 'public') {
+                    visBadge.textContent = "Public";
+                    visBadge.className = "px-2 py-0.5 rounded text-xs font-bold uppercase bg-green-100 text-green-600 border border-green-200";
+                } else {
+                    visBadge.textContent = "Shared";
+                    visBadge.className = "px-2 py-0.5 rounded text-xs font-bold uppercase bg-indigo-100 text-indigo-600 border border-indigo-200";
+                }
+
+                // Show Share button only for owner
+                if(currentUser && currentUser.uid === meta.ownerId) {
+                    shareBtn.classList.remove('hidden');
+                    shareBtn.onclick = () => openShareModal(fileId, meta);
+                }
+
                 downloadBtn.disabled = false;
                 downloadBtn.onclick = () => assembleAndDownload(fileId, meta);
 
             } catch (err) {
-                nameDisplay.textContent = "Error";
-                errorMsg.textContent = err.message;
+                // If it's a permission error, it means the rules blocked the read
+                if(err.code === 'permission-denied') {
+                    errorMsg.textContent = "Access Denied. This file is private or not shared with you.";
+                    if(!currentUser) errorMsg.innerHTML += " <br><a href='#login' class='underline font-bold'>Log in</a> to check permissions.";
+                } else {
+                    errorMsg.textContent = err.message;
+                }
+                nameDisplay.textContent = "Restricted";
                 errorMsg.classList.remove('hidden');
             }
         }
 
         async function assembleAndDownload(fileId, meta) {
-            const statusMsg = document.getElementById('reassembly-status');
-            const downloadBtn = document.getElementById('btn-download');
-            const errorMsg = document.getElementById('error-msg');
+            const statusMsg = getEl('reassembly-status');
+            const downloadBtn = getEl('btn-download');
+            const errorMsg = getEl('error-msg');
             
             downloadBtn.disabled = true;
             statusMsg.classList.remove('hidden');
             errorMsg.classList.add('hidden');
 
             try {
-                // 2. Fetch all chunks
                 const q = query(collection(db, "files", fileId, "chunks"));
                 const chunkSnaps = await getDocs(q);
                 
-                if (chunkSnaps.empty) throw new Error("No data found for this file.");
+                if (chunkSnaps.empty) throw new Error("Corrupted file: No data chunks found.");
 
-                // 3. Sort chunks by index (Firestore IDs were set to index, but query might not return ordered)
+                // Sort chunks
                 const chunks = [];
-                chunkSnaps.forEach(doc => {
-                    chunks.push({ index: parseInt(doc.id), data: doc.data().data });
-                });
+                chunkSnaps.forEach(d => chunks.push({ index: parseInt(d.id), data: d.data().data }));
                 chunks.sort((a, b) => a.index - b.index);
 
-                // 4. Stitch
                 const fullBase64 = chunks.map(c => c.data).join('');
-
-                // 5. Convert to Blob
-                const response = await fetch(fullBase64);
-                const blob = await response.blob();
+                
+                // Create Blob
+                const res = await fetch(fullBase64);
+                const blob = await res.blob();
                 const url = URL.createObjectURL(blob);
 
-                // 6. Handle Preview vs Download
+                // Preview if image
                 if (meta.type.startsWith('image/')) {
                     const img = document.createElement('img');
                     img.src = url;
-                    img.className = "max-w-full h-auto mx-auto";
-                    document.getElementById('media-preview').appendChild(img);
-                    document.getElementById('preview-container').classList.remove('hidden');
+                    img.className = "max-w-full rounded shadow-sm";
+                    const prevContainer = getEl('preview-container');
+                    const prevMedia = getEl('media-preview');
+                    prevMedia.innerHTML = '';
+                    prevMedia.appendChild(img);
+                    prevContainer.classList.remove('hidden');
                 }
 
-                // Trigger download
+                // Download
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = meta.name;
@@ -514,22 +646,130 @@
             } catch (err) {
                 console.error(err);
                 statusMsg.classList.add('hidden');
-                errorMsg.textContent = "Download failed: " + err.message;
+                errorMsg.textContent = "Download Error: " + err.message;
                 errorMsg.classList.remove('hidden');
                 downloadBtn.disabled = false;
             }
         }
 
-        // --- UI Utilities ---
+        // --- Sharing Logic ---
+        
+        window.closeShareModal = () => {
+            getEl('modal-share').classList.add('hidden');
+            // Reload file details to reflect changes in UI badges
+            if(activeFileId) loadFileDetails(activeFileId);
+        };
+
+        window.openShareModal = (fileId, data) => {
+            getEl('modal-share').classList.remove('hidden');
+            const visSelect = getEl('share-visibility');
+            const peopleSection = getEl('share-people-section');
+            const linkInput = getEl('share-link-input');
+            const list = getEl('share-list');
+
+            // Set Current State
+            visSelect.value = data.visibility || 'private';
+            linkInput.value = window.location.origin + window.location.pathname + '#view?id=' + fileId;
+
+            // Render existing users
+            renderSharedList(data.sharedWith || []);
+
+            // Visibility Change Handler
+            visSelect.onchange = async () => {
+                const val = visSelect.value;
+                try {
+                    await updateDoc(doc(db, "files", fileId), { visibility: val });
+                    showToast(`Visibility set to ${val}`);
+                    if(val === 'shared') peopleSection.classList.remove('hidden'); // Keep showing list
+                    // Note: We don't hide peopleSection on public/private immediately 
+                    // because user might want to keep the list for later 'shared' toggle.
+                } catch(e) {
+                    showToast("Error updating: " + e.message, true);
+                    visSelect.value = data.visibility; // Revert
+                }
+            };
+
+            // Add User Handler
+            getEl('btn-add-share').onclick = async () => {
+                const email = getEl('share-email-input').value.trim();
+                if(!email) return;
+                if(visSelect.value !== 'shared') {
+                    // Auto switch to shared if adding people
+                    visSelect.value = 'shared';
+                    await updateDoc(doc(db, "files", fileId), { visibility: 'shared' });
+                }
+
+                try {
+                    await updateDoc(doc(db, "files", fileId), {
+                        sharedWith: arrayUnion(email)
+                    });
+                    getEl('share-email-input').value = '';
+                    // Optimistic update or refetch? Let's refetch to be safe
+                    const fresh = await getDoc(doc(db, "files", fileId));
+                    renderSharedList(fresh.data().sharedWith);
+                    showToast(`Added ${email}`);
+                } catch(e) {
+                    showToast(e.message, true);
+                }
+            };
+            
+            // Helper to render list
+            function renderSharedList(emails) {
+                list.innerHTML = '';
+                if(!emails || emails.length === 0) {
+                    list.innerHTML = '<p class="text-xs text-gray-400 italic">No specific users added yet.</p>';
+                    return;
+                }
+                emails.forEach(email => {
+                    const div = document.createElement('div');
+                    div.className = "flex justify-between items-center bg-gray-50 p-2 rounded text-sm";
+                    div.innerHTML = `
+                        <span class="truncate text-gray-700">${email}</span>
+                        <button class="text-red-400 hover:text-red-600 text-xs font-bold ml-2 remove-share-btn">Remove</button>
+                    `;
+                    div.querySelector('.remove-share-btn').onclick = async () => {
+                        try {
+                            await updateDoc(doc(db, "files", fileId), { sharedWith: arrayRemove(email) });
+                            div.remove();
+                        } catch(e) { showToast("Error removing user", true); }
+                    };
+                    list.appendChild(div);
+                });
+            }
+
+            // Copy Link
+            getEl('btn-copy-link').onclick = () => {
+                linkInput.select();
+                document.execCommand('copy'); // Fallback for older browsers inside iframes
+                showToast("Link copied to clipboard");
+            };
+        };
+
+        // --- Global Helpers ---
+        async function deleteFile(id) {
+            if(!confirm("Delete this file permanently?")) return;
+            try {
+                await deleteDoc(doc(db, "files", id));
+                loadDashboard(); // Refresh list
+                showToast("File deleted");
+            } catch(e) { showToast(e.message, true); }
+        }
+
         function showToast(msg, isError = false) {
-            const t = document.getElementById('toast');
-            t.textContent = msg;
-            t.className = `fixed bottom-5 right-5 px-6 py-3 rounded-lg shadow-lg transform transition-transform duration-300 z-50 ${isError ? 'bg-red-600' : 'bg-gray-800'} text-white translate-y-0`;
+            const t = getEl('toast');
+            const icon = getEl('toast-icon');
+            const txt = getEl('toast-msg');
+            
+            t.className = `fixed bottom-5 right-5 px-6 py-3 rounded-xl shadow-2xl transform transition-all duration-300 z-50 font-medium flex items-center gap-3 translate-y-0 ${isError ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-gray-800 text-white'}`;
+            icon.innerHTML = isError ? '<i class="fa-solid fa-circle-exclamation"></i>' : '<i class="fa-solid fa-circle-check"></i>';
+            txt.textContent = msg;
+
             setTimeout(() => {
-                t.classList.add('translate-y-20');
+                t.classList.add('translate-y-24');
             }, 3000);
         }
     </script>
 </body>
 </html>
+
 
